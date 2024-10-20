@@ -14,6 +14,8 @@ SERVER_IP = config['DEFAULT']['ServerIP']
 SSH_USERNAME = config['SSH']['User']
 SSH_PRIV_KEY = config['SSH']['SshPrivateKey']
 
+#Create an SSH Tunnel to send traffic through
+
 ssh_tunnel = SSHTunnelForwarder(
     SERVER_IP,
     ssh_username=SSH_USERNAME,
@@ -31,7 +33,7 @@ HOST = "127.0.0.1"  # The server's hostname or IP address
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((HOST, PORT))
-    s.sendall(b"Crank it boiii")
+    s.sendall(b"Hey There Pal")
     data = s.recv(1024)
 
 print(f"Received {data!r}")
