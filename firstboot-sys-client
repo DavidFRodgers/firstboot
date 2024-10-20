@@ -1,0 +1,31 @@
+#!/usr/bin/python3
+
+import socket
+from sshtunnel import SSHTunnelForwarder
+
+PORT = 39045  # The port used by the server
+
+ssh_tunnel = SSHTunnelForwarder(
+    '192.168.1.30',
+    ssh_username="david",
+    ssh_pkey="/home/david/.ssh/id_rsa",
+    #ssh_password="secret",
+    local_bind_address=('127.0.0.1', PORT),
+    remote_bind_address=('127.0.0.1', PORT)
+)
+
+ssh_tunnel.start()
+
+
+
+HOST = "127.0.0.1"  # The server's hostname or IP address
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.connect((HOST, PORT))
+    s.sendall(b"Crank it boiii")
+    data = s.recv(1024)
+
+print(f"Received {data!r}")
+
+
+ssh_tunnel.stop()
