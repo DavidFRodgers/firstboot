@@ -10,13 +10,18 @@ def listener():
 
         def handle(self):
             # self.request is the TCP socket connected to the client
+            
             self.data = self.request.recv(1024).strip()
-            print("{} wrote:".format(self.client_address[0]))
-            print(self.data)
+            if self.data.decode() == ":::::firstboot-sys-client:::::":
+                print("client connected")
+            else:
+                print("client misconfigured")
+                return
+           
+            c1 = client(12351515, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+            openclients.append(c1)
 
-
-            # just send back the same data, but upper-cased
-            self.request.sendall(self.data.upper())
+            self.request.sendall(":::::firstboot-server:::::".encode())
 
     if __name__ == "__main__":
     
@@ -29,10 +34,31 @@ def listener():
         # this will keep running until Ctrl-C
         server.serve_forever()
 
+class client:
+    def __init__(self, client_number, complete, hostname, ip_address, gateway, user, user_password, ssh_key, sudo_nopasswd, enable_root):
+        self.client_number = client_number
+        self.complete = complete
+        self.hostname = hostname
+        self.ip_address = ip_address
+        self.gateway = gateway
+        self.user = user
+        self.user_password = user_password
+        self.ssh_key = ssh_key
+        self.sudo_nopasswd = sudo_nopasswd
+        self.enable_root = enable_root
+    
+    def __str__(self):
+        return str(self.client_number)
+    def __repr__(self):
+        return str(self.client_number)
+
+openclients = []
+
+
 t1 = Thread(target=listener)
 t1.start()
 
 while True:
-    print("yep")
+    print(openclients)
     sleep(10)
 

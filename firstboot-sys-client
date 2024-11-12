@@ -3,6 +3,8 @@
 import socket
 import configparser
 from sshtunnel import SSHTunnelForwarder
+import subprocess
+
 
 config = configparser.ConfigParser()
 config.read('firstboot_sys_client_config')
@@ -10,14 +12,14 @@ config.read('firstboot_sys_client_config')
 #Set Variables from config file
 
 PORT = int(config['DEFAULT']['ServerPort'])  # The port used by the server
-SERVER_IP = config['DEFAULT']['ServerIP']
+SERVER_ADDR = config['DEFAULT']['ServerAddr']
 SSH_USERNAME = config['SSH']['User']
 SSH_PRIV_KEY = config['SSH']['SshPrivateKey']
 
 #Create an SSH Tunnel to send traffic through
 
 ssh_tunnel = SSHTunnelForwarder(
-    SERVER_IP,
+    SERVER_ADDR,
     ssh_username=SSH_USERNAME,
     ssh_pkey=SSH_PRIV_KEY,
     #ssh_password="secret",
@@ -27,16 +29,15 @@ ssh_tunnel = SSHTunnelForwarder(
 
 ssh_tunnel.start()
 
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect(("127.0.0.1", PORT))
+s.sendall(":::::firstboot-sys-client:::::".encode())
+data = s.recv(1024).strip()
 
-
-HOST = "127.0.0.1"  # The server's hostname or IP address
-
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.connect((HOST, PORT))
-    s.sendall(b"Hey There Pal")
-    data = s.recv(1024)
-
-print(f"Received {data!r}")
+if data.decode() == ":::::firstboot-server:::::":
+    print("Connected to Server")
+else:
+    print("What?")
 
 
 ssh_tunnel.stop()
