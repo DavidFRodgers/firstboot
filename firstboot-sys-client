@@ -39,5 +39,111 @@ if data.decode() == ":::::firstboot-server:::::":
 else:
     print("What?")
 
+data = s.recv(1024).strip()
+
+data_mod = data.decode().replace(":::::configuration:::::", '').replace(":::::end_configuration:::::", '').strip()
+
+print(data_mod)
+
+client_config = configparser.ConfigParser()
+client_config.read_string(data_mod)
+
+hostname = client_config['DEFAULT']['hostname']
+ip_address = client_config['DEFAULT']['ip_address']
+gateway = client_config['DEFAULT']['gateway']
+user = client_config['DEFAULT']['user']
+user_password = client_config['DEFAULT']['user_password']
+ssh_key = client_config['DEFAULT']['ssh_key']
+
+if client_config['DEFAULT']['sudo_nopasswd'] == "True":
+    sudo_nopasswd = True
+elif client_config['DEFAULT']['sudo_nopasswd'] == "False":
+    sudo_nopasswd = False
+
+if client_config['DEFAULT']['enable_root'] == "True":
+    enable_root = True
+elif client_config['DEFAULT']['enable_root'] == "False":
+    enable_root = False
+
+f = open("/etc/hostname.test", "r")
+lines = f.readlines()
+f.close()
+old_hostname = lines[0].strip()
+
+f = open("/etc/hostname.test", "w")
+f.write(hostname + "\n")
+f.close()
+
+f = open("/etc/hosts.test", "r")
+lines = f.readlines()
+f.close()
+
+for line_num, line in enumerate(lines):
+    if old_hostname in line:
+        lines[line_num] = line.replace(old_hostname, hostname)
+
+f = open("/etc/hosts.test", "w")
+for x in lines:
+    f.write(x)
+f.close()
+
+f = open("/etc/network/interfaces.test", "r")
+lines = f.readlines()
+f.close()
+
+for line_num, line in enumerate(lines):
+    if "inet dhcp" in line:
+        lines[line_num] = line.replace("inet dhcp", "inet static")
+        split = line_num + 1 
+
+lines = lines[:split] + ["\taddress " + ip_address + '\n'] + ["\tgateway " + gateway + '\n'] + lines[split:]
+
+f = open("/etc/network/interfaces.test", "w")
+for x in lines:
+    f.write(x)
+f.close()
+
+
+subprocess.run(["useradd", "-m", user, "-s", "/bin/bash"])
+
+cmd_input = user + ":" + user_password
+subprocess.run(["chpasswd", "-e"], input=cmd_input.encode())
+
+subprocess.run(["usermod", "-a", "-G", "sudo", user])
+
+subprocess.run(["mkdir", "/home/" + user + "/.ssh"])
+
+subprocess.run(["touch", "/home/" + user + "/.ssh/authorized_keys"])
+
+f = open("/home/" + user + "/.ssh/authorized_keys", "a")
+f.write(ssh_key + "\n")
+f.close()
+
+
+subprocess.run(["cp", "/etc/sudoers.test", "/tmp/sudoers.test.test"])
+
+f = open("/tmp/sudoers.test.test", "r")
+lines = f.readlines()
+f.close()
+
+if sudo_nopasswd == True:
+    
+    for line_num, line in enumerate(lines):
+        if "%sudo\tALL=(ALL:ALL) ALL\n" in line:
+            lines[line_num] = "%sudo\tALL=(ALL:ALL) NOPASSWD:ALL\n"
+
+    f = open("/tmp/sudoers.test.test", "w")
+    for x in lines:
+        f.write(x)
+    f.close()
+
+    p = subprocess.run(["visudo", "-csf", "/tmp/sudoers.test.test"])
+
+    if p.returncode == 0:
+        subprocess.run(["cp", "/tmp/sudoers.test.test", "/etc/sudoers.test"])
+
+if enable_root == False:
+    subprocess.run(["usermod", "-L", "root"])
+
 
 ssh_tunnel.stop()

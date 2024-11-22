@@ -3,6 +3,9 @@
 import socketserver
 from threading import Thread
 from time import sleep
+import re
+import subprocess
+import os
 
 
 def listener():
@@ -17,11 +20,30 @@ def listener():
             else:
                 print("client misconfigured")
                 return
-           
-            c1 = client(12351515, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-            openclients.append(c1)
 
             self.request.sendall(":::::firstboot-server:::::".encode())
+            
+            global number_of_clients
+            self.client_number = number_of_clients + 1
+            number_of_clients = number_of_clients + 1
+
+            c1 = client(self.client_number, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+            openclients.append(c1)
+
+            loop_ctrl = True
+            while loop_ctrl == True:
+                for x in openclients:
+                    if x.client_number == self.client_number and x.complete == True:
+                        position = openclients.index(x)
+                        return_data = openclients.pop(position)
+                        loop_ctrl = False
+
+            return_data.makeConfig()
+            return_data.printConfig()
+            
+
+            self.request.sendall(return_data.config.encode())
+
 
     if __name__ == "__main__":
     
@@ -51,7 +73,21 @@ class client:
         return str(self.client_number)
     def __repr__(self):
         return str(self.client_number)
+    def makeConfig(self):
+        self.config = ":::::configuration:::::\n" + '[DEFAULT]\nhostname = ' + str(self.hostname) + '\n' + 'ip_address = ' + str(self.ip_address) + '\n' + 'gateway = ' + str(self.gateway) + '\n' + 'user = ' + str(self.user) + '\n' + 'user_password = ' + str(self.user_password) + '\n' + 'ssh_key = ' + str(self.ssh_key) + '\n' + 'sudo_nopasswd = ' + str(self.sudo_nopasswd) + '\n' + 'enable_root = ' + str(self.enable_root) + '\n' + ':::::end_configuration:::::'
+    def printConfig(self):
+        print(self.config)
 
+
+
+regex_hostname = "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$"
+regex_ip_with_mask = "^(?:[0-9]{1,3}\.){3}[0-9]{1,3}\/(?:[0-9]|[1-2][0-9]|3[0-2])$"
+regex_ip_address = "^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$"
+regex_username = "^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$"
+
+
+global number_of_clients
+number_of_clients = 0
 openclients = []
 
 
@@ -59,6 +95,74 @@ t1 = Thread(target=listener)
 t1.start()
 
 while True:
-    print(openclients)
-    sleep(10)
+    if len(openclients) > 0:
+        #openclients[0].printConfig()
+        print("New Client Attached")
+        
+        while True:
+            print("Hostname: ", end = '')
+            openclients[0].hostname = input()
+            if re.match(regex_hostname, openclients[0].hostname):
+                break
+            else:
+                print("Invalid Hostname")
+            
+        while True:
+            print("IP Address: ", end = '') 
+            openclients[0].ip_address = input()
+            if re.match(regex_ip_with_mask, openclients[0].ip_address):
+                break
+            else:
+                print("Invalid IP Address, include subnet mask. ex. 192.168.1.100/24")
+
+        while True:
+            print("Gateway: ", end = '') 
+            openclients[0].gateway = input()
+            if re.match(regex_ip_address, openclients[0].gateway): 
+                break
+            else:
+                print("Invalid IP Address")
+
+        while True:
+            print("Username: ", end = '') 
+            openclients[0].user = input()
+            if re.match(regex_username, openclients[0].user):
+                break
+            else:
+                print("Invalid Username")
+
+        while True:
+            print("Password: ", end = '')
+            os.system("stty -echo")
+            password1 = input()
+            print("\nPassword Again: ", end = '')
+            password2 = input()
+            os.system("stty echo")
+            if password1 == password2:
+                password = subprocess.check_output(['openssl', 'passwd', '-6', password1], text=True)
+                openclients[0].user_password = password.strip()
+                break
+            else:
+                print("Passwords do not match")
+        
+
+        print("\nSSH Key:", end = '')
+        openclients[0].ssh_key = input()
+        print("Sudo NOPASSWD (Yes/No): ", end = '')
+        sudo_input = input()
+        if sudo_input == "Yes":
+            openclients[0].sudo_nopasswd = True
+        else:
+            openclients[0].sudo_nopasswd = False
+        print("Enable Root (Yes/No): ", end = '')
+        root_input = input()
+        if root_input == "Yes":
+            openclients[0].enable_root = True
+        else:
+            openclients[0].enable_root = False
+        openclients[0].complete = True
+        sleep(2)
+
+
+    sleep(1)
 
