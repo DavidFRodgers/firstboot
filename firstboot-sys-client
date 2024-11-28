@@ -7,7 +7,7 @@ import subprocess
 
 
 config = configparser.ConfigParser()
-config.read('firstboot_sys_client_config')
+config.read('/home/david/firstboot/firstboot_sys_client_config')
 
 #Set Variables from config file
 
@@ -144,6 +144,9 @@ if sudo_nopasswd == True:
 
 if enable_root == False:
     subprocess.run(["usermod", "-L", "root"])
+
+
+subprocess.run(["systemctl", "disable", "firstboot.service"])
 
 
 ssh_tunnel.stop()
