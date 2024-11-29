@@ -33,9 +33,11 @@ Copy ssh key to firstboot server
 
 Download and expand firstboot
 
-> wget ... 
-> tar -xzvf firstboot.tar.gz
-> cd firstboot
+`wget ...`
+
+`tar -xzvf firstboot.tar.gz`
+
+`cd firstboot`
 
 
 
