@@ -21,7 +21,7 @@ Setup a server, with an SSH server, and a static IP address. Download the firstb
 
 ### Setup Client Template
 
-Install Debian to a virtual machine. Configure the system to your liking. I reccomend not creating a regular user and enabling root. Firstboot will create a priviledged user, and allow for disabling root. 
+Install Debian to a virtual machine. Configure the system to your liking. I reccomend not creating a regular user and enabling root. Firstboot will create a priviledged user, and allow for disabling root later. 
 
 Create SSH Key, default options will be fine
 
@@ -31,9 +31,9 @@ Copy ssh key to firstboot server
 
 `# ssh-copy-id user@firstboot-server-ip`
 
-Install Dependacies
+Install Dependacies (sudo will not be installed if only the root user was configured)
 
-`# apt-get install python3-sshtunnel`
+`# apt-get install python3-sshtunnel sudo`
 
 Download and expand firstboot
 
