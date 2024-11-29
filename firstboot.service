@@ -1,0 +1,10 @@
+[Unit]
+Description=First Boot Service
+After=default.target
+
+[Service] 
+ExecStart=/home/david/firstboot/firstboot-sys-client
+Type=simple
+
+[Install]
+WantedBy=default.target
