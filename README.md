@@ -25,19 +25,19 @@ Install Debian to a virtual machine. Configure the system to your liking. I recc
 
 Create SSH Key, default options will be fine
 
-> ssh-keygen
+> `ssh-keygen`
 
 Copy ssh key to firstboot server
 
-> ssh-copy-id user@firstboot-server-ip
+> `ssh-copy-id user@firstboot-server-ip`
 
 Download and expand firstboot
 
-`wget ...`
+> `wget ...`
 
-`tar -xzvf firstboot.tar.gz`
+> `tar -xzvf firstboot.tar.gz`
 
-`cd firstboot`
+> `cd firstboot`
 
 
 
