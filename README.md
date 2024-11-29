@@ -31,6 +31,10 @@ Copy ssh key to firstboot server
 
 `# ssh-copy-id user@firstboot-server-ip`
 
+Install Dependacies
+
+`# apt-get install python3-sshtunnel`
+
 Download and expand firstboot
 
 `# wget ...`
@@ -53,7 +57,13 @@ Shutdown the client and convert it to a template.
 
 `# shutdown now`
 
+## Running Firstboot
 
+On server move to firstboot directory and run firstboot-server
+
+`# ./firstboot-server`
+
+Clone your template, and start the clone. 
 
 
 
