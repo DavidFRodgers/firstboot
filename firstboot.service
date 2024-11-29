@@ -1,9 +1,9 @@
 [Unit]
-Description=First Boot Service
+Description=Firstboot Service
 After=default.target
 
 [Service] 
-ExecStart=/home/david/firstboot/firstboot-sys-client
+ExecStart=/usr/local/bin/firstboot-sys-client
 Type=simple
 
 [Install]

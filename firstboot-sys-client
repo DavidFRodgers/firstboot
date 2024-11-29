@@ -7,7 +7,7 @@ import subprocess
 
 
 config = configparser.ConfigParser()
-config.read('/home/david/firstboot/firstboot_sys_client_config')
+config.read('/etc/firstboot.conf')
 
 #Set Variables from config file
 
@@ -65,16 +65,16 @@ if client_config['DEFAULT']['enable_root'] == "True":
 elif client_config['DEFAULT']['enable_root'] == "False":
     enable_root = False
 
-f = open("/etc/hostname.test", "r")
+f = open("/etc/hostname", "r")
 lines = f.readlines()
 f.close()
 old_hostname = lines[0].strip()
 
-f = open("/etc/hostname.test", "w")
+f = open("/etc/hostname", "w")
 f.write(hostname + "\n")
 f.close()
 
-f = open("/etc/hosts.test", "r")
+f = open("/etc/hosts", "r")
 lines = f.readlines()
 f.close()
 
@@ -82,12 +82,12 @@ for line_num, line in enumerate(lines):
     if old_hostname in line:
         lines[line_num] = line.replace(old_hostname, hostname)
 
-f = open("/etc/hosts.test", "w")
+f = open("/etc/hosts", "w")
 for x in lines:
     f.write(x)
 f.close()
 
-f = open("/etc/network/interfaces.test", "r")
+f = open("/etc/network/interfaces", "r")
 lines = f.readlines()
 f.close()
 
@@ -98,7 +98,7 @@ for line_num, line in enumerate(lines):
 
 lines = lines[:split] + ["\taddress " + ip_address + '\n'] + ["\tgateway " + gateway + '\n'] + lines[split:]
 
-f = open("/etc/network/interfaces.test", "w")
+f = open("/etc/network/interfaces", "w")
 for x in lines:
     f.write(x)
 f.close()
@@ -120,9 +120,9 @@ f.write(ssh_key + "\n")
 f.close()
 
 
-subprocess.run(["cp", "/etc/sudoers.test", "/tmp/sudoers.test.test"])
+subprocess.run(["cp", "/etc/sudoers", "/tmp/sudoers.test"])
 
-f = open("/tmp/sudoers.test.test", "r")
+f = open("/tmp/sudoers.test", "r")
 lines = f.readlines()
 f.close()
 
@@ -132,15 +132,15 @@ if sudo_nopasswd == True:
         if "%sudo\tALL=(ALL:ALL) ALL\n" in line:
             lines[line_num] = "%sudo\tALL=(ALL:ALL) NOPASSWD:ALL\n"
 
-    f = open("/tmp/sudoers.test.test", "w")
+    f = open("/tmp/sudoers.test", "w")
     for x in lines:
         f.write(x)
     f.close()
 
-    p = subprocess.run(["visudo", "-csf", "/tmp/sudoers.test.test"])
+    p = subprocess.run(["visudo", "-csf", "/tmp/sudoers.test"])
 
     if p.returncode == 0:
-        subprocess.run(["cp", "/tmp/sudoers.test.test", "/etc/sudoers.test"])
+        subprocess.run(["cp", "/tmp/sudoers.test", "/etc/sudoers"])
 
 if enable_root == False:
     subprocess.run(["usermod", "-L", "root"])
@@ -148,5 +148,6 @@ if enable_root == False:
 
 subprocess.run(["systemctl", "disable", "firstboot.service"])
 
-
 ssh_tunnel.stop()
+
+subprocess.run(["reboot"])
