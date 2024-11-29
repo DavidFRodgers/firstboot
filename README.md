@@ -21,4 +21,23 @@ Setup a server, with an SSH server, and a static IP address. Download the firstb
 
 ### Setup Client Template
 
-Install Debian to a virtual machine. Configure the system to your liking. 
+Install Debian to a virtual machine. Configure the system to your liking. I reccomend not creating a regular user and enabling root. Firstboot will create a priviledged user, and allow for disabling root. 
+
+Create SSH Key, default options will be fine
+
+> ssh-keygen
+
+Copy ssh key to firstboot server
+
+> ssh-copy-id user@firstboot-server-ip
+
+Download and expand firstboot
+
+> wget ... 
+> tar -xzvf firstboot.tar.gz
+> cd firstboot
+
+
+
+
+
