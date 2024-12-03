@@ -16,12 +16,12 @@ For security, firstboot creates an SSH tunnel between the server and client for 
 
 ### Setup Server
 
-Setup a server, with an SSH server, and a static IP address. Download the firstboot-server script. The script will be run manually from the command line when you are bringing new clones online. 
+Setup a computer or vm with an SSH server and a static IP address. Download the firstboot-server script. The script will be run manually from the command line when you are bringing new clones online. 
 
 
 ### Setup Client Template
 
-Install Debian to a virtual machine. Configure the system to your liking. I reccomend not creating a regular user and enabling root. Firstboot will create a priviledged user, and allow for disabling root later. 
+Install Debian to a virtual machine. Configure the system to your liking. I reccomend not creating a regular user. Firstboot will create a priviledged user, and allow for disabling root later. 
 
 Create SSH Key, default options will be fine
 
@@ -33,29 +33,29 @@ Copy ssh key to firstboot server
 
 Install Dependacies (sudo will not be installed if only the root user was configured)
 
-`# apt-get install python3-sshtunnel sudo`
+`# apt-get install python3-sshtunnel git sudo`
 
 Download and expand firstboot
 
-`# wget ...`
-
-`# tar -xzvf firstboot.tar.gz`
+`# git clone ...`
 
 `# cd firstboot`
 
-Edit settings in firstboot.conf
+Edit settings in firstboot.conf with your favourite editor
 
 `# nano firstboot.conf`
 
-Set the server ip, username used with "ssh-copy-id", and ensure the ssh private key is the once created with "ssh-keygen"
+Set the server ip, username used with "ssh-copy-id", and ensure the ssh private key is the one created with "ssh-keygen" 
 
 Run install-client.sh
 
 `# ./install-client.sh`
 
-Shutdown the client and convert it to a template. 
+Shutdown the client 
 
 `# shutdown now`
+
+Convert it to a template. 
 
 ## Running Firstboot
 
@@ -63,7 +63,8 @@ On server move to firstboot directory and run firstboot-server
 
 `# ./firstboot-server`
 
-Clone your template, and start the clone. 
+Clone your template, and start the clone. Return to the computer running firstboot-server. You will be prompted to enter the configuration for the client. (note: when entering the ssh key, enter the full text of the key, not a file location containing a key). When complete, the client will reboot with the new configuration. 
+
 
 
 
