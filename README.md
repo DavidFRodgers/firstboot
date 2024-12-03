@@ -4,11 +4,16 @@ Firstboot is a client/server program to configure Debian virtual machine templat
 
 ## Overview
 
-When preparing a virtual machine template, firstboot-sys-client is installed into the template. When the template is cloned and run for the first time, firstboot-sys-client connects to the configured server. On the server you manually enter the following:
+When preparing a virtual machine template, firstboot-sys-client is installed into the template. When the template is cloned and run for the first time, firstboot-sys-client connects to the configured server. Firstboot will then configure the client as follows:
 
-Hostname, Static IP Address, Gateway, New User Info, an SSH Key, whether to allow passwordless sudo access, and to enable or disable root. 
+- Sets a new hostname
+- Sets a static IP address and gateway
+- Creates a new user with a password and sudo priviledges
+- Optionally uploads an ssh key to the new user
+- Optionally allows sudo to be run without a password
+- Optionally disables root account
 
-firstboot-sys-client takes these settings, configures them on the new clone, disables itself and restarts the clone, resulting in a unique Debian instance. 
+Firstboot then disables itself and restarts the clone, resulting in a unique Debian instance. 
 
 For security, firstboot creates an SSH tunnel between the server and client for data transfer. 
 
@@ -35,7 +40,7 @@ Install Dependacies (sudo will not be installed if only the root user was config
 
 `# apt-get install python3-sshtunnel git sudo`
 
-Download and expand firstboot
+Download firstboot
 
 `# git clone https://github.com/DavidFRodgers/firstboot.git`
 
