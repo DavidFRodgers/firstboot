@@ -37,7 +37,7 @@ Install Dependacies (sudo will not be installed if only the root user was config
 
 Download and expand firstboot
 
-`# git clone ...`
+`# git clone https://github.com/DavidFRodgers/firstboot.git`
 
 `# cd firstboot`
 
